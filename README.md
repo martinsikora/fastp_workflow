@@ -1,4 +1,4 @@
-# fastp_workflow Snakemake Workflow
+# fastp_workflow
 
 Snakemake pipeline for trimming FASTQ reads with `fastp`. It supports both
 single-end and paired-end data, produces trimmed/merged FASTQs, and emits HTML
