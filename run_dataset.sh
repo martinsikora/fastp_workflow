@@ -1,23 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ -t 1 ]]; then
+    COLOR_BOLD="$(printf '\033[1m')"
+    COLOR_EXAMPLE="$(printf '\033[90m')"
+    COLOR_BLUE="$(printf '\033[34m')"
+    COLOR_GREEN="$(printf '\033[32m')"
+    COLOR_YELLOW="$(printf '\033[33m')"
+    COLOR_RESET="$(printf '\033[0m')"
+else
+    COLOR_BOLD=""
+    COLOR_EXAMPLE=""
+    COLOR_BLUE=""
+    COLOR_GREEN=""
+    COLOR_YELLOW=""
+    COLOR_RESET=""
+fi
+
 usage() {
     cat << EOF
-Usage: $(basename "$0") DATASET [OPTIONS] [-- SNAKEMAKE_ARGS...]
+${COLOR_BOLD}${COLOR_BLUE}Usage:${COLOR_RESET} $(basename "$0") ${COLOR_GREEN}DATASET${COLOR_RESET} [OPTIONS] [-- ${COLOR_YELLOW}SNAKEMAKE_ARGS${COLOR_RESET}...]
 
 Run the Snakemake workflow locally.
 
-Arguments:
-  DATASET       Path to dataset directory containing config/config.yml
+${COLOR_BOLD}${COLOR_BLUE}Arguments:${COLOR_RESET}
+  ${COLOR_GREEN}DATASET${COLOR_RESET}       Path to dataset directory containing config/config.yml
 
-Options:
-  --dry-run     Run Snakemake with --dry-run
-  -h, --help    Show this help message
+${COLOR_BOLD}${COLOR_BLUE}Options:${COLOR_RESET}
+  ${COLOR_YELLOW}--dry-run${COLOR_RESET}     Run Snakemake with --dry-run
+  ${COLOR_YELLOW}-h, --help${COLOR_RESET}    Show this help message
 
-Examples:
-  bash $(basename "$0") dataset_example
-  bash $(basename "$0") /path/to/dataset -- --cores 8 --rerun-incomplete
-  bash $(basename "$0") dataset_example --dry-run
+${COLOR_BOLD}${COLOR_BLUE}Examples:${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") /path/to/dataset -- --cores 8 --rerun-incomplete${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example --dry-run${COLOR_RESET}
 EOF
     exit 0
 }

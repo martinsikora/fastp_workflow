@@ -3,32 +3,48 @@
 set -euo pipefail
 
 # Usage information
+if [[ -t 1 ]]; then
+    COLOR_BOLD="$(printf '\033[1m')"
+    COLOR_EXAMPLE="$(printf '\033[90m')"
+    COLOR_BLUE="$(printf '\033[34m')"
+    COLOR_GREEN="$(printf '\033[32m')"
+    COLOR_YELLOW="$(printf '\033[33m')"
+    COLOR_RESET="$(printf '\033[0m')"
+else
+    COLOR_BOLD=""
+    COLOR_EXAMPLE=""
+    COLOR_BLUE=""
+    COLOR_GREEN=""
+    COLOR_YELLOW=""
+    COLOR_RESET=""
+fi
+
 usage() {
     cat << EOF
-Usage: $(basename "$0") DATASET [OPTIONS]
+${COLOR_BOLD}${COLOR_BLUE}Usage:${COLOR_RESET} $(basename "$0") ${COLOR_GREEN}DATASET${COLOR_RESET} [OPTIONS]
 
 Submit Snakemake workflow to SLURM with automatic resource management.
 
-Arguments:
-  DATASET       Path to dataset directory containing config/config.yml
+${COLOR_BOLD}${COLOR_BLUE}Arguments:${COLOR_RESET}
+  ${COLOR_GREEN}DATASET${COLOR_RESET}       Path to dataset directory containing config/config.yml
 
-Options:
-  -j, --jobs N          Maximum number of jobs to run in parallel (default: 100)
-  -p, --partition NAME  SLURM partition to use (default: general)
-  -t, --time TIME       Max walltime per job (default: 4:00:00)
-  -m, --mem MB          Default memory per job in MB (default: 8000)
-  --dry-run            Show what would be done without submitting jobs
-  --unlock             Unlock working directory
-  --                   Pass remaining args directly to Snakemake
-  -h, --help           Show this help message
+${COLOR_BOLD}${COLOR_BLUE}Options:${COLOR_RESET}
+  ${COLOR_YELLOW}-j, --jobs N${COLOR_RESET}          Maximum number of jobs to run in parallel (default: 100)
+  ${COLOR_YELLOW}-p, --partition NAME${COLOR_RESET}  SLURM partition to use (default: general)
+  ${COLOR_YELLOW}-t, --time TIME${COLOR_RESET}       Max walltime per job (default: 4:00:00)
+  ${COLOR_YELLOW}-m, --mem MB${COLOR_RESET}          Default memory per job in MB (default: 8000)
+  ${COLOR_YELLOW}--dry-run${COLOR_RESET}             Show what would be done without submitting jobs
+  ${COLOR_YELLOW}--unlock${COLOR_RESET}              Unlock working directory
+  ${COLOR_YELLOW}--${COLOR_RESET}                   Pass remaining args directly to Snakemake
+  ${COLOR_YELLOW}-h, --help${COLOR_RESET}            Show this help message
 
-Example:
-  bash $(basename "$0") cgg/018
-  bash $(basename "$0") cgg/100 --jobs 50 --partition highmem
+${COLOR_BOLD}${COLOR_BLUE}Example:${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/018${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/100 --jobs 50 --partition highmem${COLOR_RESET}
 
   # For testing without submitting:
-  bash $(basename "$0") cgg/018 --dry-run
-  bash $(basename "$0") cgg/018 -- --rerun-incomplete --keep-going
+  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/018 --dry-run${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/018 -- --rerun-incomplete --keep-going${COLOR_RESET}
 
 EOF
     exit 0
