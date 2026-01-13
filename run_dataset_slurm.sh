@@ -39,12 +39,12 @@ ${COLOR_BOLD}${COLOR_BLUE}Options:${COLOR_RESET}
   ${COLOR_YELLOW}-h, --help${COLOR_RESET}            Show this help message
 
 ${COLOR_BOLD}${COLOR_BLUE}Example:${COLOR_RESET}
-  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/018${COLOR_RESET}
-  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/100 --jobs 50 --partition highmem${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example --jobs 50 --partition highmem${COLOR_RESET}
 
   # For testing without submitting:
-  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/018 --dry-run${COLOR_RESET}
-  ${COLOR_EXAMPLE}bash $(basename "$0") cgg/018 -- --rerun-incomplete --keep-going${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example --dry-run${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example -- --rerun-incomplete --keep-going${COLOR_RESET}
 
 EOF
     exit 0

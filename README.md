@@ -94,16 +94,26 @@ Example output structure:
 
 ```
 ${out_dir}/
-└── SAMPLE01/
+├── SAMPLE01/
+│   ├── fastq/
+│   │   ├── SAMPLE01_L001.fastp.R1.fq.gz
+│   │   ├── SAMPLE01_L001.fastp.R2.fq.gz
+│   │   └── SAMPLE01_L001.fastp.coll.fq.gz
+│   ├── log/
+│   │   └── SAMPLE01_L001.fastp.log
+│   └── report/
+│       ├── SAMPLE01_L001.fastp.html
+│       └── SAMPLE01_L001.fastp.json
+└── SAMPLE02/
     ├── fastq/
-    │   ├── SAMPLE01_L001.fastp.R1.fq.gz
-    │   ├── SAMPLE01_L001.fastp.R2.fq.gz
-    │   └── SAMPLE01_L001.fastp.coll.fq.gz
+    │   ├── SAMPLE02_L001.fastp.R1.fq.gz
+    │   ├── SAMPLE02_L001.fastp.R2.fq.gz
+    │   └── SAMPLE02_L001.fastp.coll.fq.gz
     ├── log/
-    │   └── SAMPLE01_L001.fastp.log
+    │   └── SAMPLE02_L001.fastp.log
     └── report/
-        ├── SAMPLE01_L001.fastp.html
-        └── SAMPLE01_L001.fastp.json
+        ├── SAMPLE02_L001.fastp.html
+        └── SAMPLE02_L001.fastp.json
 ```
 
 Single-end runs write the merged FASTQ to `*.fastp.coll.fq.gz` and touch empty

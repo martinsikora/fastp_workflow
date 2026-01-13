@@ -32,7 +32,7 @@ ${COLOR_BOLD}${COLOR_BLUE}Options:${COLOR_RESET}
 
 ${COLOR_BOLD}${COLOR_BLUE}Examples:${COLOR_RESET}
   ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example${COLOR_RESET}
-  ${COLOR_EXAMPLE}bash $(basename "$0") /path/to/dataset -- --cores 8 --rerun-incomplete${COLOR_RESET}
+  ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example -- --cores 8 --rerun-incomplete${COLOR_RESET}
   ${COLOR_EXAMPLE}bash $(basename "$0") dataset_example --dry-run${COLOR_RESET}
 EOF
     exit 0
