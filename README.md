@@ -48,10 +48,10 @@ fastp:
 
 Example:
 
-```
-unit_id	unit_prefix	fq1	fq2
-SAMPLE01	SAMPLE01_L001	/data/fastq/SAMPLE01_L001_R1.fastq.gz	/data/fastq/SAMPLE01_L001_R2.fastq.gz
-SAMPLE02	SAMPLE02_L001	/data/fastq/SAMPLE02_L001_R1.fastq.gz	
+```text
+unit_id unit_prefix fq1 fq2
+SAMPLE01 SAMPLE01_L001 /data/fastq/SAMPLE01_L001_R1.fastq.gz /data/fastq/SAMPLE01_L001_R2.fastq.gz
+SAMPLE02 SAMPLE02_L001 /data/fastq/SAMPLE02_L001_R1.fastq.gz 
 ```
 
 ## Run locally
@@ -92,7 +92,7 @@ For each `unit_id`, outputs are written under `${out_dir}/${unit_id}/`:
 
 Example output structure:
 
-```
+```text
 ${out_dir}/
 ├── SAMPLE01/
 │   ├── fastq/
