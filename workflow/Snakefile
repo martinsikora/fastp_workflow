@@ -1,0 +1,139 @@
+"""
+Snakemake workflow for trimming FASTQ reads using fastp.
+Handles both single-end and paired-end data with adapter trimming and quality filtering.
+"""
+
+import pandas as pd
+import os
+
+
+## ---------------------------------------------------------
+## Global parameters from config file
+
+OUT_DIR = config["out_dir"]
+ADAPTERS = config["fastp"]["adapters"].replace("{workflow.basedir}", workflow.basedir)
+
+
+## ---------------------------------------------------------
+## helpers
+
+unit_df = pd.read_table(config["units"], comment="#", dtype={"unit_id": str})
+# Create composite index for unique identification of each row
+unit_df["composite_id"] = unit_df["unit_id"] + "___" + unit_df["unit_prefix"]
+unit_df = unit_df.set_index("composite_id", drop=False)
+UNITS = unit_df.index.tolist()
+
+
+## ---------------------------------------------------------
+## Helper functions
+
+def get_fq(wildcards):
+    """Get input FASTQ files for a sample unit (single-end or paired-end)."""
+    composite_id = f"{wildcards.unit_id}___{wildcards.unit_prefix}"
+    fq1 = unit_df.loc[composite_id, "fq1"]
+    fq2 = unit_df.loc[composite_id, "fq2"]
+    if pd.isnull(fq2):
+        return {"fq": [fq1]}
+    else:
+        return {"fq": [fq1, fq2]}
+
+
+## ---------------------------------------------------------
+## targets
+
+
+rule all:
+    input:
+        expand(
+            f"{OUT_DIR}/{{unit_id}}/report/{{unit_prefix}}.fastp.json",
+            zip,
+            unit_id=unit_df["unit_id"].tolist(),
+            unit_prefix=unit_df["unit_prefix"].tolist(),
+        ),
+        expand(
+            f"{OUT_DIR}/{{unit_id}}/report/{{unit_prefix}}.fastp.html",
+            zip,
+            unit_id=unit_df["unit_id"].tolist(),
+            unit_prefix=unit_df["unit_prefix"].tolist(),
+        ),
+        # Paired-end outputs
+        expand(
+            f"{OUT_DIR}/{{unit_id}}/fastq/{{unit_prefix}}.fastp.R1.fq.gz",
+            zip,
+            unit_id=unit_df[~unit_df["fq2"].isnull()]["unit_id"].tolist(),
+            unit_prefix=unit_df[~unit_df["fq2"].isnull()]["unit_prefix"].tolist(),
+        ),
+        expand(
+            f"{OUT_DIR}/{{unit_id}}/fastq/{{unit_prefix}}.fastp.R2.fq.gz",
+            zip,
+            unit_id=unit_df[~unit_df["fq2"].isnull()]["unit_id"].tolist(),
+            unit_prefix=unit_df[~unit_df["fq2"].isnull()]["unit_prefix"].tolist(),
+        ),
+        expand(
+            f"{OUT_DIR}/{{unit_id}}/fastq/{{unit_prefix}}.fastp.coll.fq.gz",
+            zip,
+            unit_id=unit_df[~unit_df["fq2"].isnull()]["unit_id"].tolist(),
+            unit_prefix=unit_df[~unit_df["fq2"].isnull()]["unit_prefix"].tolist(),
+        )
+    default_target: True
+
+
+## ---------------------------------------------------------
+## rules
+
+
+rule trim_adapters:
+    """
+    Trim adapters and low-quality sequences using fastp.
+    Handles both single-end and paired-end data.
+    """
+    input:
+        unpack(get_fq),
+        adapters=ADAPTERS,
+    output:
+        json=f"{OUT_DIR}/{{unit_id}}/report/{{unit_prefix}}.fastp.json",
+        html=f"{OUT_DIR}/{{unit_id}}/report/{{unit_prefix}}.fastp.html",
+        fq1=f"{OUT_DIR}/{{unit_id}}/fastq/{{unit_prefix}}.fastp.R1.fq.gz",
+        fq2=f"{OUT_DIR}/{{unit_id}}/fastq/{{unit_prefix}}.fastp.R2.fq.gz",
+        merged=f"{OUT_DIR}/{{unit_id}}/fastq/{{unit_prefix}}.fastp.coll.fq.gz",
+    threads: 4
+    log:
+        f"{OUT_DIR}/{{unit_id}}/log/{{unit_prefix}}.fastp.log",
+    params:
+        min_l=config["fastp"]["min_l"],
+        min_overlap=config["fastp"]["min_overlap"],
+        out_dir=lambda wildcards: f"{OUT_DIR}/{wildcards.unit_id}",
+        fastq_dir=lambda wildcards: f"{OUT_DIR}/{wildcards.unit_id}/fastq",
+        log_dir=lambda wildcards: f"{OUT_DIR}/{wildcards.unit_id}/log",
+        report_dir=lambda wildcards: f"{OUT_DIR}/{wildcards.unit_id}/report",
+    run:
+        import os
+        import subprocess
+        from pathlib import Path
+        os.makedirs(params.out_dir, exist_ok=True)
+        os.makedirs(params.fastq_dir, exist_ok=True)
+        os.makedirs(params.log_dir, exist_ok=True)
+        os.makedirs(params.report_dir, exist_ok=True)
+        
+        # Determine if single-end or paired-end by checking input length
+        if len(input.fq) == 1:
+            # Single-end processing
+            cmd = (
+                f"fastp -i {input.fq[0]} -o {output.merged} -l {params.min_l} -w {threads} "
+                f"-j {output.json} --adapter_fasta {input.adapters} -h {output.html} "
+                f"--trim_poly_g --trim_poly_x --low_complexity_filter 2> {log}"
+            )
+            subprocess.run(cmd, shell=True, check=True)
+            # Touch unused paired-end output files
+            Path(output.fq1).touch()
+            Path(output.fq2).touch()
+        else:
+            # Paired-end processing
+            cmd = (
+                f"fastp -i {input.fq[0]} -I {input.fq[1]} -o {output.fq1} -O {output.fq2} "
+                f"-l {params.min_l} --overlap_len_require {params.min_overlap} "
+                f"-m --merged_out {output.merged} -w {threads} -j {output.json} "
+                f"--adapter_fasta {input.adapters} -h {output.html} "
+                f"--trim_poly_g --trim_poly_x --low_complexity_filter 2> {log}"
+            )
+            subprocess.run(cmd, shell=True, check=True)

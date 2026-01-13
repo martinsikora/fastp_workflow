@@ -1,0 +1,6 @@
+out_dir: fastp
+units: config/units.tsv
+fastp:
+  min_l: 25
+  min_overlap: 11
+  adapters: "{workflow.basedir}/workflow/resources/adapterList.fa"
